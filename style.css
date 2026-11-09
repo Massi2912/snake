@@ -1,0 +1,362 @@
+/* ==========================================================
+   Snake – Layout & Design
+   Alles ist in rem gebaut: Die Basisschrift wächst mit dem
+   Spielfeld, dadurch skaliert die gesamte Oberfläche mit.
+   ========================================================== */
+
+:root {
+  --bg: #070a12;
+  --panel: #0e1422;
+  --line: #1c2540;
+  --text: #e8edff;
+  --muted: #7d89aa;
+  --neon: #2df5c8;
+  --violet: #8b5cff;
+  --rose: #ff4d79;
+  --gold: #ffd24a;
+  --key-bg: #182036;
+  --key-line: #323d5e;
+  --key-text: #c4cde6;
+  --font: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Kantenlänge des Spielfelds: passt in Breite und Höhe, kein Scrollen.
+     Auf grossen Bildschirmen wächst das Feld bis 1200px mit. */
+  --board-size: min(92vw, calc(100dvh - 215px), 80dvh, 1200px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* Basisschrift (1rem) wächst mit dem Spielfeld: 16px bei 600px Feldgrösse */
+html {
+  font-size: max(16px, calc(var(--board-size) / 37.5));
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% -5%, rgba(139, 92, 255, 0.22), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 50% 105%, rgba(45, 245, 200, 0.14), transparent 70%),
+    var(--bg);
+}
+
+.app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* ---------- Anzeigen ---------- */
+.hud {
+  width: var(--board-size);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+}
+
+.title {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  background: linear-gradient(90deg, var(--neon), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.75rem rgba(45, 245, 200, 0.35));
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 5.75rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+}
+.stat-right { align-items: flex-end; }
+.stat-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.03em; }
+.stat-value {
+  font-size: clamp(1.15rem, 4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.stat-right .stat-value { color: var(--gold); }
+
+/* ---------- Spielfeld (Rahmen mit Farbverlauf) ---------- */
+.board {
+  position: relative;
+  width: var(--board-size);
+  height: var(--board-size);
+  padding: 0.125rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, rgba(45, 245, 200, 0.75), rgba(139, 92, 255, 0.75));
+  box-shadow: 0 0 2.25rem rgba(45, 245, 200, 0.16), 0 0 5.625rem rgba(139, 92, 255, 0.22);
+  overflow: hidden;
+  touch-action: none;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 1.125rem;
+}
+
+/* ---------- Overlays ---------- */
+.overlay {
+  position: absolute;
+  inset: 0.125rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 1.125rem;
+  background: rgba(7, 10, 18, 0.7);
+  backdrop-filter: blur(0.375rem);
+  -webkit-backdrop-filter: blur(0.375rem);
+  animation: overlay-in 0.25s ease-out;
+}
+.overlay.hidden { display: none; }
+
+@keyframes overlay-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.overlay h2 {
+  font-size: clamp(1.8rem, 7vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: linear-gradient(90deg, var(--neon), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 1rem rgba(45, 245, 200, 0.4));
+}
+#overlay-over h2 {
+  background: linear-gradient(90deg, var(--rose), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 1rem rgba(255, 77, 121, 0.45));
+}
+
+.overlay p { line-height: 1.8; font-size: clamp(0.85rem, 2.6vw, 1rem); color: var(--text); }
+.overlay .hint { color: var(--muted); font-size: 0.8rem; }
+.final strong { color: var(--gold); font-size: 1.6em; font-variant-numeric: tabular-nums; }
+#new-record { color: var(--gold); font-weight: 700; }
+#new-record.hidden { display: none; }
+
+/* Tasten: schlichte, flache Tastenkappen ohne Verlauf und Glow */
+kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  margin: 0 0.1em;
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--key-line);
+  border-bottom-width: 2px;
+  border-radius: 0.25em;
+  background: var(--key-bg);
+  color: var(--key-text);
+  font: inherit;
+  font-size: 0.8em;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.8125rem 2.125rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--neon), #5fd4ff);
+  color: #04120f;
+  cursor: pointer;
+  box-shadow: 0 0 1.5rem rgba(45, 245, 200, 0.4);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.btn:hover { box-shadow: 0 0 2.125rem rgba(45, 245, 200, 0.65); }
+.btn:active { transform: scale(0.96); }
+.btn:focus-visible, .touch-btn:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+
+/* ---------- Pause-Menü & Tastenbelegung ---------- */
+.overlay { overflow-y: auto; justify-content: safe center; scrollbar-width: none; }
+.overlay::-webkit-scrollbar { display: none; }
+
+.menu { display: flex; gap: 0.625rem; width: min(100%, 26.25rem); }
+.menu .btn { flex: 1; padding: 0.6875rem 1rem; white-space: nowrap; }
+#overlay-pause { gap: 0.75rem; }
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.1); box-shadow: none; }
+
+.info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+  width: min(100%, 35rem);
+  text-align: left;
+}
+
+.card {
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.875rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  font-size: 0.8rem;
+}
+.card h3 {
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--neon);
+}
+
+.rows > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+  padding: 0.4375rem 0;
+}
+.rows > div + div { border-top: 1px solid var(--line); }
+.rows dt { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text); }
+.rows dd { color: var(--muted); text-align: right; line-height: 1.35; }
+.touch-only { display: none !important; }
+
+/* Kleiderschrank */
+.wardrobe { width: min(100%, 35rem); text-align: left; }
+.skins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+.skin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.375rem 0.25rem 0.3125rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.skin canvas { display: block; width: 100%; height: auto; aspect-ratio: 120 / 44; border-radius: 0; }
+.skin:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+.skin.selected {
+  border-color: var(--neon);
+  color: var(--text);
+  background: rgba(45, 245, 200, 0.1);
+  box-shadow: 0 0 0.875rem rgba(45, 245, 200, 0.25);
+}
+.skin:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
+
+/* Symbole für die Futter-Arten */
+.swatch { flex: none; display: inline-block; width: 0.75rem; height: 0.75rem; }
+.swatch-food {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff9db5, var(--rose));
+  box-shadow: 0 0 0.5rem var(--rose);
+}
+.swatch-bonus {
+  border-radius: 2px;
+  transform: rotate(45deg) scale(0.85);
+  background: linear-gradient(135deg, #fff2b0, var(--gold));
+  box-shadow: 0 0 0.5rem var(--gold);
+}
+.swatch-speed {
+  border-radius: 50%;
+  border: 2px solid var(--violet);
+  border-right-color: transparent;
+}
+
+/* Dauerhafte Tastenleiste unter dem Spielfeld: schlichter Text mit Tastenkappen */
+.legend {
+  width: var(--board-size);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.375rem 1.75rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  white-space: nowrap;
+}
+.pill kbd { margin: 0 0.08em; }
+.pill kbd:last-of-type { margin-right: 0.55rem; }
+
+/* ---------- Touch-Buttons (nur Mobilgeräte) ---------- */
+.touch {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-areas:
+    ". up ."
+    "left pause right"
+    ". down .";
+  gap: 0.5rem;
+  width: min(13.75rem, 56vw);
+}
+
+.touch-btn {
+  aspect-ratio: 1;
+  border-radius: 0.5rem;
+  border: 1px solid var(--key-line);
+  border-bottom-width: 3px;
+  background: var(--key-bg);
+  color: var(--key-text);
+  font-size: 1.1rem;
+  touch-action: manipulation;
+}
+.touch-btn:active {
+  background: #232d4b;
+  transform: translateY(2px);
+}
+.t-up { grid-area: up; }
+.t-left { grid-area: left; }
+.t-pause { grid-area: pause; font-size: 0.75rem; color: var(--muted); }
+.t-right { grid-area: right; }
+.t-down { grid-area: down; }
+
+@media (hover: none) and (pointer: coarse) {
+  :root { --board-size: min(92vw, calc(100dvh - 340px), 62dvh, 900px); }
+  .touch { display: grid; }
+  .legend, .kb { display: none !important; }
+  .touch-only { display: flex !important; }
+  .overlay .hint { display: none; }
+  .overlay { gap: 0.625rem; padding: 0.875rem; }
+  .info { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay { animation: none; }
+}

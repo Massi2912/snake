@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Snake</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <!-- Anzeigen für Punkte und Highscore -->
+    <header class="hud">
+      <div class="stat">
+        <span class="stat-label">Punkte</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <h1 class="title">Snake</h1>
+      <div class="stat stat-right">
+        <span class="stat-label">Highscore</span>
+        <span class="stat-value" id="highscore">0</span>
+      </div>
+    </header>
+
+    <!-- Spielfeld mit Overlays -->
+    <div class="board" id="board">
+      <canvas id="game" width="600" height="600"></canvas>
+
+      <div class="overlay" id="overlay-start">
+        <h2>Bereit?</h2>
+        <p>Steuere mit <kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> oder <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>.</p>
+        <button class="btn" data-action="start">Spiel starten</button>
+        <section class="card wardrobe">
+          <h3>Kleiderschrank</h3>
+          <div class="skins" data-wardrobe></div>
+        </section>
+        <p class="hint"><kbd>Enter</kbd> Start <kbd>P</kbd> <kbd>Esc</kbd> Pause</p>
+      </div>
+
+      <div class="overlay hidden" id="overlay-pause">
+        <h2>Pause</h2>
+        <div class="menu">
+          <button class="btn" data-action="resume">Weiterspielen</button>
+          <button class="btn btn-ghost" data-action="restart">Neustart</button>
+        </div>
+        <div class="info">
+          <section class="card">
+            <h3>Tasten</h3>
+            <dl class="rows">
+              <div class="kb"><dt>Bewegen</dt><dd><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd></dd></div>
+              <div class="kb"><dt>Alternativ</dt><dd><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dd></div>
+              <div class="kb"><dt>Pause</dt><dd><kbd>P</kbd><kbd>Esc</kbd></dd></div>
+              <div class="kb"><dt>Start / Neustart</dt><dd><kbd>Enter</kbd></dd></div>
+              <div class="touch-only"><dt>Bewegen</dt><dd>Touch-Tasten</dd></div>
+            </dl>
+          </section>
+          <section class="card">
+            <h3>Futter</h3>
+            <dl class="rows">
+              <div><dt><i class="swatch swatch-food"></i>Rote Kugel</dt><dd>+10 Punkte, Schlange wächst</dd></div>
+              <div><dt><i class="swatch swatch-bonus"></i>Goldener Diamant</dt><dd>+50 Punkte, selten, nur 5 Sekunden da</dd></div>
+              <div><dt><i class="swatch swatch-speed"></i>Tempo</dt><dd>Alle 5 Futter etwas schneller</dd></div>
+            </dl>
+          </section>
+        </div>
+        <section class="card wardrobe">
+          <h3>Kleiderschrank</h3>
+          <div class="skins" data-wardrobe></div>
+        </section>
+      </div>
+
+      <div class="overlay hidden" id="overlay-over">
+        <h2>Game Over</h2>
+        <p class="final">Punkte: <strong id="final-score">0</strong></p>
+        <p class="final" id="new-record">Neuer Highscore!</p>
+        <button class="btn" data-action="restart">Neustart</button>
+        <p class="hint"><kbd>Enter</kbd> Neustart</p>
+      </div>
+    </div>
+
+    <!-- Tastenbelegung (nur am Desktop sichtbar) -->
+    <footer class="legend" aria-label="Tastenbelegung">
+      <span class="pill"><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Bewegen</span>
+      <span class="pill"><kbd>P</kbd><kbd>Esc</kbd> Pause</span>
+      <span class="pill"><kbd>Enter</kbd> Start / Neustart</span>
+    </footer>
+
+    <!-- Touch-Buttons (nur auf Mobilgeräten sichtbar) -->
+    <nav class="touch" aria-label="Steuerung">
+      <button class="touch-btn t-up" data-dir="up" aria-label="Hoch">▲</button>
+      <button class="touch-btn t-left" data-dir="left" aria-label="Links">◀</button>
+      <button class="touch-btn t-pause" data-action="pause" aria-label="Pause">❚❚</button>
+      <button class="touch-btn t-right" data-dir="right" aria-label="Rechts">▶</button>
+      <button class="touch-btn t-down" data-dir="down" aria-label="Runter">▼</button>
+    </nav>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
